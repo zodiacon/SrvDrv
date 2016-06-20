@@ -1,0 +1,14 @@
+﻿<metro:MetroWindow x:Class="SrvDrv.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:local="clr-namespace:SrvDrv"
+        xmlns:view="clr-namespace:SrvDrv.Views"
+        mc:Ignorable="d"
+        Title="Services and Drivers" TitleCaps="False" MinHeight="350" MinWidth="525">
+    <view:MainView>
+        
+    </view:MainView>
+</metro:MetroWindow>
