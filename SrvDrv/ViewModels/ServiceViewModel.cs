@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
@@ -17,9 +18,6 @@ namespace SrvDrv.ViewModels {
         [Import]
         IMessageBoxService MessageBoxService;
 
-        [Import]
-        string AppName;
-
         public ServiceViewModel(ServiceController service) {
             Service = service;
         }
@@ -27,13 +25,19 @@ namespace SrvDrv.ViewModels {
         ICommand _startCommand;
         public ICommand StartCommand => _startCommand ?? (_startCommand = new DelegateCommand(() => StartService(true), () => Service.Status == ServiceControllerStatus.Stopped));
 
+        internal ServiceViewModel Compose(CompositionContainer container) {
+            container.ComposeParts(this);
+            return this;
+        }
+
         private void StartService(bool start) {
             try {
                 Service.Start();
             }
             catch(Exception ex) {
-                MessageBoxService.ShowMessage($"Error: {ex.Message}", AppName);
+                MessageBoxService.ShowMessage($"Error: {ex.Message}", Constants.AppName);
             }
         }
+
     }
 }
