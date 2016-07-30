@@ -3,26 +3,48 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using Prism.Commands;
 using Prism.Mvvm;
+using Zodiacon.WPF;
 
 namespace SrvDrv.ViewModels {
     [Export]
-    class MainViewModel : BindableBase, IPartImportsSatisfiedNotification {
-        public ServicesViewModel ServicesViewModel { get; } = new ServicesViewModel(true);
+    class MainViewModel : BindableBase {
+        IEnumerable<ServiceViewModel> _services;
 
-        public ServicesViewModel DevicesViewModel { get; } = new ServicesViewModel(false);
+        public IEnumerable<ServiceViewModel> Services {
+            get {
+                if(_services == null) {
+                    _services = ServiceController.GetServices().Concat(ServiceController.GetDevices()).Select(svc => new ServiceViewModel(svc));
+                }
+                return _services;
+            }
+        }
 
         [Import]
-        CompositionContainer _container;
+        IMessageBoxService MessageBoxService;
 
         public MainViewModel() {
         }
 
-        public void OnImportsSatisfied() {
-            _container.ComposeParts(ServicesViewModel);
-            _container.ComposeParts(DevicesViewModel);
+        ICommand _startCommand;
+        public ICommand StartCommand => _startCommand ?? (_startCommand = new DelegateCommand<ServiceViewModel>(vm => {
+            StartService(vm.Service, true);
+        }, svc => svc.Service.Status == ServiceControllerStatus.Stopped));
+
+
+        private void StartService(ServiceController service, bool start) {
+            try {
+                service.Start();
+            }
+            catch(Exception ex) {
+                MessageBoxService.ShowMessage($"Error: {ex.Message}", Constants.AppName);
+            }
         }
+
     }
 }

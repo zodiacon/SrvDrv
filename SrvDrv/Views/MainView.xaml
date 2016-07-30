@@ -7,7 +7,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <TabControl>
-        </TabControl>        
+        <DataGrid ItemsSource="{Binding Services}" IsReadOnly="True" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" />
+
+            </DataGrid.Columns>   
+        </DataGrid>
     </Grid>
 </UserControl>
