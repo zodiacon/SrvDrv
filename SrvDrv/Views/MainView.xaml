@@ -4,15 +4,84 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SrvDrv.Views"
+             xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="bool2vis" />
+    </UserControl.Resources>
     <Grid>
-        <DataGrid ItemsSource="{Binding Services}" IsReadOnly="True" AutoGenerateColumns="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="4,2">
+            <ToggleButton IsChecked="{Binding ShowServices}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/icons/gear.ico" Width="24" Height="24" />
+                    <TextBlock Text="Services" Margin="4,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+            </ToggleButton>
+            <ToggleButton IsChecked="{Binding ShowDrivers}" Margin="6,0,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/icons/driver.ico" Width="24" Height="24" />
+                    <TextBlock Text="Services" Margin="4,0,0,0" VerticalAlignment="Center" />
+                </StackPanel>
+            </ToggleButton>
+        </StackPanel>
+        <TextBox Grid.Row="1" Text="{Binding SearchText, Delay=300, UpdateSourceTrigger=PropertyChanged}" 
+                 metro:TextBoxHelper.SelectAllOnFocus="True" metro:TextBoxHelper.Watermark="Search Services and Drivers"
+                 metro:TextBoxHelper.ClearTextButton="True" MinWidth="300" Margin="2"/>
+        <DataGrid Grid.Row="2" ItemsSource="{Binding Services}" IsReadOnly="True" AutoGenerateColumns="False" 
+                  SelectionMode="Single" SelectionUnit="FullRow" >
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow" BasedOn="{StaticResource MetroDataGridRow}">
+                    <!--<Setter Property="DetailsVisibility" Value="Collapsed" />-->
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                <DataGridTemplateColumn Header="Name" SortMemberPath="Name">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <DockPanel LastChildFill="False">
+                                <Image DockPanel.Dock="Left" Source="{Binding Icon}" Width="24" Height="24" />
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding Name}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                            </DockPanel>
+                            <DataTemplate.Triggers>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" />
-
-            </DataGrid.Columns>   
+                <DataGridTextColumn Header="Type" Binding="{Binding Type}" />
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
+                <DataGridTextColumn Header="Start Type" Binding="{Binding StartType}" />
+            </DataGrid.Columns>
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="1" Margin="1" BorderBrush="{DynamicResource AccentColorBrush2}" Padding="1">
+                        <StackPanel Background="{DynamicResource WhiteBrush}" TextElement.Foreground="{DynamicResource BlackBrush}">
+                            <TextBlock Margin="2" MaxWidth="600" TextWrapping="Wrap" HorizontalAlignment="Left">
+                            <Span><Bold>Description: </Bold></Span>
+                            <Run Text="{Binding Description, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Margin="2">
+                                <Span><Bold>Depends on: </Bold></Span>
+                                <Run Text="{Binding DependsOn, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Margin="2">
+                                <Span><Bold>Dependent Services: </Bold></Span>
+                                <Run Text="{Binding DependentServices, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Margin="2">
+                                <Span><Bold>Supported Operations: </Bold></Span>
+                                <Run Text="{Binding SupportedOperations, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
         </DataGrid>
     </Grid>
 </UserControl>

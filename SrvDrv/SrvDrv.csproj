@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>649</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -150,7 +151,26 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icons\data.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\play.ico" />
+    <Resource Include="Icons\stop.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\gear_run.ico" />
+    <Resource Include="Icons\gear_stop.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\driver.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\info.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\gear.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
