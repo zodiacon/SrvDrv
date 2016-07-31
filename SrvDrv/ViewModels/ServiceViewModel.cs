@@ -15,7 +15,7 @@ using Prism.Mvvm;
 using Zodiacon.WPF;
 
 namespace SrvDrv.ViewModels {
-    class ServiceViewModel : BindableBase {
+    class ServiceViewModel : BindableBase, IDisposable {
         public ServiceController Service { get; }
 
         public ServiceViewModel(ServiceController service) {
@@ -47,7 +47,7 @@ namespace SrvDrv.ViewModels {
             }
         }
 
-        public string Status => Service.Status.ToString();
+        public ServiceControllerStatus Status => Service.Status;
 
         string _description;
         public string Description => _description ?? (_description = GetDescription());
@@ -55,20 +55,41 @@ namespace SrvDrv.ViewModels {
         [DllImport("advapi32", CharSet = CharSet.Unicode)]
         private static extern int RegLoadMUIString(SafeRegistryHandle hKey, string value, StringBuilder output, int count, out int size, uint flags, string directory);
 
+        public void Refresh() {
+            Service.Refresh();
+            OnPropertyChanged(nameof(Status));
+            OnPropertyChanged(nameof(Icon));
+        }
+
         static StringBuilder _descString = new StringBuilder(1024);
 
+        RegistryKey _key;
         private string GetDescription() {
-            using(var key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\Services\" + Name)) {
-                int size = _descString.Capacity;
-                int error = RegLoadMUIString(key.Handle, "Description", _descString, size, out size, 0, null);
-                var desc = string.Empty;
-                if(error == 0)
-                    desc = _descString.ToString();
-                return desc;
+            var key = GetRegistryKey();
+            int size = _descString.Capacity;
+            int error = RegLoadMUIString(key.Handle, "Description", _descString, size, out size, 0, null);
+            var desc = string.Empty;
+            if(error == 0)
+                desc = _descString.ToString();
+            return desc;
+        }
+
+        private RegistryKey GetRegistryKey() {
+            if(_key == null)
+                _key = Registry.LocalMachine.OpenSubKey(@"System\CurrentControlSet\Services\" + Name);
+            return _key;
+        }
+
+        public string RunAs {
+            get {
+                var key = GetRegistryKey();
+                return key.GetValue("ObjectName", string.Empty).ToString();
             }
         }
 
-        public string StartType => Service.StartType.ToString();
+        public string ImagePath => GetRegistryKey().GetValue("ImagePath", string.Empty, RegistryValueOptions.None).ToString();
+
+        public string StartType => $"{Service.StartType} ({(int)Service.StartType})";
 
         public string DependsOn => string.Join(", ", Service.ServicesDependedOn.Select(svc => svc.ServiceName));
 
@@ -89,6 +110,11 @@ namespace SrvDrv.ViewModels {
 
             }
             return "/icons/driver.ico";
+        }
+
+        public void Dispose() {
+            Service.Dispose();
+            _key.Dispose();
         }
 
         public string SupportedOperations {

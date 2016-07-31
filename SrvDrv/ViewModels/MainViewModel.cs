@@ -31,20 +31,61 @@ namespace SrvDrv.ViewModels {
         IMessageBoxService MessageBoxService;
 
         public MainViewModel() {
+            StartCommand = new DelegateCommand(async () => {
+                var vm = SelectedItem;
+                await StartService(vm, true);
+            }, () => SelectedItem != null && SelectedItem.Status == ServiceControllerStatus.Stopped)
+            .ObservesProperty(() => SelectedItem);
+
+            StopCommand = new DelegateCommand(async () => {
+                var vm = SelectedItem;
+                await StartService(vm, false);
+            }, () => SelectedItem != null && SelectedItem.Service.CanStop && SelectedItem.Status == ServiceControllerStatus.Running)
+            .ObservesProperty(() => SelectedItem);
         }
 
-        ICommand _startCommand;
-        public ICommand StartCommand => _startCommand ?? (_startCommand = new DelegateCommand<ServiceViewModel>(vm => {
-            StartService(vm.Service, true);
-        }, svc => svc.Service.Status == ServiceControllerStatus.Stopped));
+        private ServiceViewModel _selectedItem;
+
+        public ServiceViewModel SelectedItem {
+            get { return _selectedItem; }
+            set { SetProperty(ref _selectedItem, value); }
+        }
+
+        public DelegateCommandBase StartCommand { get; }
+        public DelegateCommandBase StopCommand { get; }
+
+        private bool _isBusy;
+
+        public bool IsBusy {
+            get { return _isBusy; }
+            set { SetProperty(ref _isBusy, value); }
+        }
 
 
-        private void StartService(ServiceController service, bool start) {
+        private async Task StartService(ServiceViewModel service, bool start) {
             try {
-                service.Start();
+                var svc = service.Service;
+                IsBusy = true;
+                if(start)
+                    svc.Start();
+                else
+                    svc.Stop();
+                await Task.Run(() => {
+                    svc.WaitForStatus(start ? ServiceControllerStatus.Running : ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
+                });
+            }
+            catch(System.ServiceProcess.TimeoutException) {
+                MessageBoxService.ShowMessage("Operation timed out.", Constants.AppName);
             }
             catch(Exception ex) {
                 MessageBoxService.ShowMessage($"Error: {ex.Message}", Constants.AppName);
+            }
+            finally {
+                IsBusy = false;
+
+                service.Refresh();
+                StartCommand.RaiseCanExecuteChanged();
+                StopCommand.RaiseCanExecuteChanged();
             }
         }
 
