@@ -5,11 +5,13 @@
              xmlns:local="clr-namespace:SrvDrv.Views"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:ext="clr-namespace:Zodiacon.WPF;assembly=Zodiacon.WPF"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="bool2vis" />
+        <ext:BindingProxy x:Key="proxy" Data="{Binding}" />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -51,7 +53,7 @@
                 </StackPanel>
             </ToggleButton>
 
-            <Button Margin="20,0,0,0"
+            <Button Margin="20,0,0,0" MinWidth="80" FontSize="12"
                     Command="{Binding StartCommand, Mode=OneTime}"
                     CommandParameter="{Binding SelectedItem}">
                 <StackPanel Orientation="Horizontal">
@@ -63,7 +65,7 @@
                                Text="Start" />
                 </StackPanel>
             </Button>
-            <Button Margin="6,0,0,0"
+            <Button Margin="6,0,0,0" MinWidth="80" FontSize="12"
                     Command="{Binding StopCommand}"
                     CommandParameter="{Binding SelectedItem}">
                 <StackPanel Orientation="Horizontal">
@@ -97,6 +99,16 @@
             <DataGrid.RowStyle>
                 <Style BasedOn="{StaticResource MetroDataGridRow}" TargetType="DataGridRow">
                     <!--<Setter Property="DetailsVisibility" Value="Collapsed" />-->
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu DataContext="{Binding Data, Source={StaticResource proxy}}">
+                                <MenuItem Header="Start Service" Command="{Binding StartCommand}" Icon="{ext:Image /icons/play.ico, Width=20, Height=20}"/>
+                                <MenuItem Header="Stop Service" Command="{Binding StoptCommand}" Icon="{ext:Image /icons/stop.ico, Width=20, Height=20}"/>
+                                <Separator />
+                                <MenuItem Header="Delete Service" Command="{Binding DeleteServiceCommand}" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
@@ -138,20 +150,20 @@
                                 <Run FontWeight="Bold" Text="{Binding Description, Mode=OneWay}" />
                             </TextBlock>
                             <TextBlock Margin="2">
+                                <Span>ImagePath:</Span>
+                                <Run FontWeight="Bold" Text="{Binding ImagePath, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Margin="2">
                                 <Span>Depends on:</Span>
                                 <Run FontWeight="Bold" Text="{Binding DependsOn, Mode=OneWay}" />
                             </TextBlock>
-                            <TextBlock Margin="2">
+                            <TextBlock Margin="2" MaxWidth="500" TextWrapping="Wrap" HorizontalAlignment="Left">
                                 <Span>Dependent Services:</Span>
                                 <Run FontWeight="Bold" Text="{Binding DependentServices, Mode=OneWay}" />
                             </TextBlock>
                             <TextBlock Margin="2">
                                 <Span>Supported Operations:</Span>
                                 <Run FontWeight="Bold" Text="{Binding SupportedOperations, Mode=OneWay}" />
-                            </TextBlock>
-                            <TextBlock Margin="2">
-                                <Span>ImagePath:</Span>
-                                <Run FontWeight="Bold" Text="{Binding ImagePath, Mode=OneWay}" />
                             </TextBlock>
                         </StackPanel>
                     </Border>

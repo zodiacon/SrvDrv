@@ -59,6 +59,8 @@ namespace SrvDrv.ViewModels {
             Service.Refresh();
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(Icon));
+            OnPropertyChanged(nameof(DependentServices));
+            OnPropertyChanged(nameof(DependsOn));
         }
 
         static StringBuilder _descString = new StringBuilder(1024);

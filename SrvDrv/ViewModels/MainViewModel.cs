@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
@@ -42,6 +43,14 @@ namespace SrvDrv.ViewModels {
                 await StartService(vm, false);
             }, () => SelectedItem != null && SelectedItem.Service.CanStop && SelectedItem.Status == ServiceControllerStatus.Running)
             .ObservesProperty(() => SelectedItem);
+
+            GotoRegistryCommand = new DelegateCommand(() => {
+                var regedit = Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + @"\regedit.exe");
+                regedit.WaitForInputIdle();
+
+                // now comes the tricky part. need to send keystrokes
+
+            });
         }
 
         private ServiceViewModel _selectedItem;
@@ -53,6 +62,7 @@ namespace SrvDrv.ViewModels {
 
         public DelegateCommandBase StartCommand { get; }
         public DelegateCommandBase StopCommand { get; }
+        public DelegateCommandBase GotoRegistryCommand { get; }
 
         private bool _isBusy;
 

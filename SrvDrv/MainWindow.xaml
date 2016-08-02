@@ -7,7 +7,8 @@
         xmlns:local="clr-namespace:SrvDrv"
         xmlns:view="clr-namespace:SrvDrv.Views"
         mc:Ignorable="d"
-        Title="Services and Drivers" TitleCaps="False" MinHeight="350" MinWidth="525"
+        Title="Services and Drivers" TitleCaps="False" MinHeight="350" SizeToContent="Width"
+                   Icon="/icons/main.ico" 
                    BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1">
     <view:MainView>
         
