@@ -7,7 +7,7 @@
              xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:ext="clr-namespace:Zodiacon.WPF;assembly=Zodiacon.WPF"
              d:DesignHeight="300"
-             d:DesignWidth="300"
+             d:DesignWidth="600"
              mc:Ignorable="d">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="bool2vis" />
@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        
+
         <StackPanel Margin="4,2" Orientation="Horizontal">
             <StackPanel.Resources>
                 <Style BasedOn="{StaticResource MetroToggleButton}" TargetType="ToggleButton">
@@ -77,6 +77,18 @@
                                Text="Stop" />
                 </StackPanel>
             </Button>
+            <ToggleButton Margin="6,0,0,0" MinWidth="80" FontSize="12"
+                          Command="{Binding PauseContinueCommand}"
+                    CommandParameter="{Binding SelectedItem}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="24"
+                           Height="24"
+                           Source="/icons/pause.ico" />
+                    <TextBlock Margin="4,0,0,0"
+                               VerticalAlignment="Center"
+                               Text="Pause" />
+                </StackPanel>
+            </ToggleButton>
         </StackPanel>
         <TextBox Grid.Row="1"
                  Width="300"
@@ -94,7 +106,7 @@
                   IsReadOnly="True"
                   ItemsSource="{Binding Services}"
                   SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-                  SelectionMode="Single"
+                  SelectionMode="Single" VirtualizingPanel.IsVirtualizing="True"
                   SelectionUnit="FullRow">
             <DataGrid.RowStyle>
                 <Style BasedOn="{StaticResource MetroDataGridRow}" TargetType="DataGridRow">
@@ -131,7 +143,7 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding DisplayName}" Header="Display Name" />
                 <DataGridTextColumn Binding="{Binding Type}" Header="Type" />
-                <DataGridTextColumn Binding="{Binding Status}" Header="Status" />
+                <DataGridTextColumn Binding="{Binding Status}" Header="Status" FontWeight="Bold" />
                 <DataGridTextColumn Binding="{Binding StartType}" Header="Start Type" />
                 <DataGridTextColumn Binding="{Binding RunAs}" Header="Run As" />
             </DataGrid.Columns>

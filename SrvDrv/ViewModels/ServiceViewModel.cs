@@ -119,6 +119,8 @@ namespace SrvDrv.ViewModels {
             _key.Dispose();
         }
 
+        public bool IsPaused => Status == ServiceControllerStatus.Paused;
+
         public string SupportedOperations {
             get {
                 var ops = new List<string>(4);

@@ -44,6 +44,12 @@ namespace SrvDrv.ViewModels {
             }, () => SelectedItem != null && SelectedItem.Service.CanStop && SelectedItem.Status == ServiceControllerStatus.Running)
             .ObservesProperty(() => SelectedItem);
 
+            PauseContinueCommand = new DelegateCommand(async () => {
+                var vm = SelectedItem;
+                await Task.Run(() => PauseOrContinue(vm));
+            }, () => SelectedItem != null && SelectedItem.Service.CanPauseAndContinue)
+            .ObservesProperty(() => SelectedItem);
+
             GotoRegistryCommand = new DelegateCommand(() => {
                 var regedit = Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.Windows) + @"\regedit.exe");
                 regedit.WaitForInputIdle();
@@ -51,6 +57,30 @@ namespace SrvDrv.ViewModels {
                 // now comes the tricky part. need to send keystrokes
 
             });
+        }
+
+        private bool PauseOrContinue(ServiceViewModel vm) {
+            try {
+                IsBusy = true;
+                if(vm.Status == ServiceControllerStatus.Running) {
+                    vm.Service.Pause();
+                    vm.Service.WaitForStatus(ServiceControllerStatus.Paused, TimeSpan.FromSeconds(5));
+                }
+                else if(vm.Status == ServiceControllerStatus.Paused) {
+                    vm.Service.Continue();
+                    vm.Service.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(5));
+                }
+                else
+                    return false;
+            }
+            catch(System.ServiceProcess.TimeoutException) {
+                return false;
+            }
+            finally {
+                vm.Refresh();
+                IsBusy = false;
+            }
+            return true;
         }
 
         private ServiceViewModel _selectedItem;
@@ -63,6 +93,7 @@ namespace SrvDrv.ViewModels {
         public DelegateCommandBase StartCommand { get; }
         public DelegateCommandBase StopCommand { get; }
         public DelegateCommandBase GotoRegistryCommand { get; }
+        public DelegateCommandBase PauseContinueCommand { get; }
 
         private bool _isBusy;
 
