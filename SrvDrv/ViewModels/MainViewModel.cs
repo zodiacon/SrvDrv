@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
@@ -35,7 +36,7 @@ namespace SrvDrv.ViewModels {
             StartCommand = new DelegateCommand(async () => {
                 var vm = SelectedItem;
                 await StartService(vm, true);
-            }, () => SelectedItem != null && SelectedItem.Status == ServiceControllerStatus.Stopped)
+            }, () => SelectedItem != null && SelectedItem.Service.StartType != ServiceStartMode.Disabled && SelectedItem.Status == ServiceControllerStatus.Stopped)
             .ObservesProperty(() => SelectedItem);
 
             StopCommand = new DelegateCommand(async () => {
@@ -56,6 +57,13 @@ namespace SrvDrv.ViewModels {
 
                 // now comes the tricky part. need to send keystrokes
 
+            });
+
+            OpenImageFolderCommand = new DelegateCommand(() => {
+                var path = SelectedItem.ImagePath.Trim('\"');             
+                if(path.StartsWith("\\SystemRoot\\"))
+                    path = path.Replace("\\SystemRoot\\", "%SystemRoot%\\");
+                Process.Start(Path.GetDirectoryName(Environment.ExpandEnvironmentVariables(path)));
             });
         }
 
@@ -94,6 +102,7 @@ namespace SrvDrv.ViewModels {
         public DelegateCommandBase StopCommand { get; }
         public DelegateCommandBase GotoRegistryCommand { get; }
         public DelegateCommandBase PauseContinueCommand { get; }
+        public DelegateCommandBase OpenImageFolderCommand { get; }
 
         private bool _isBusy;
 

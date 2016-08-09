@@ -91,7 +91,17 @@ namespace SrvDrv.ViewModels {
 
         public string ImagePath => GetRegistryKey().GetValue("ImagePath", string.Empty, RegistryValueOptions.None).ToString();
 
-        public string StartType => $"{Service.StartType} ({(int)Service.StartType})";
+        public bool IsDelayStart {
+            get {
+                int delayStart, size;
+                Win32.QueryServiceConfig2(Service.ServiceHandle.DangerousGetHandle(), Win32.ServiceInfoLevel.DelayedAutoStart, out delayStart, sizeof(int), out size);
+                return delayStart > 0;
+            }
+        }
+
+        public string DelayedStart => Service.StartType == ServiceStartMode.Automatic && IsDelayStart ? " (Delay Start)" : string.Empty;
+
+        public string StartType => $"{Service.StartType} ({(int)Service.StartType}) {DelayedStart}";
 
         public string DependsOn => string.Join(", ", Service.ServicesDependedOn.Select(svc => svc.ServiceName));
 

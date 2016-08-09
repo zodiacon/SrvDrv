@@ -117,6 +117,8 @@
                                 <MenuItem Header="Start Service" Command="{Binding StartCommand}" Icon="{ext:Image /icons/play.ico, Width=20, Height=20}"/>
                                 <MenuItem Header="Stop Service" Command="{Binding StoptCommand}" Icon="{ext:Image /icons/stop.ico, Width=20, Height=20}"/>
                                 <Separator />
+                                <MenuItem Header="Open Image Folder in Explorer" Command="{Binding OpenImageFolderCommand}" />
+                                <Separator />
                                 <MenuItem Header="Delete Service" Command="{Binding DeleteServiceCommand}" />
                             </ContextMenu>
                         </Setter.Value>
