@@ -15,7 +15,7 @@ using Prism.Mvvm;
 using Zodiacon.WPF;
 
 namespace SrvDrv.ViewModels {
-    class ServiceViewModel : BindableBase, IDisposable {
+    sealed class ServiceViewModel : BindableBase, IDisposable {
         public ServiceController Service { get; }
 
         public ServiceViewModel(ServiceController service) {
@@ -57,10 +57,10 @@ namespace SrvDrv.ViewModels {
 
         public void Refresh() {
             Service.Refresh();
-            OnPropertyChanged(nameof(Status));
-            OnPropertyChanged(nameof(Icon));
-            OnPropertyChanged(nameof(DependentServices));
-            OnPropertyChanged(nameof(DependsOn));
+            RaisePropertyChanged(nameof(Status));
+            RaisePropertyChanged(nameof(Icon));
+            RaisePropertyChanged(nameof(DependentServices));
+            RaisePropertyChanged(nameof(DependsOn));
         }
 
         static StringBuilder _descString = new StringBuilder(1024);
@@ -93,9 +93,14 @@ namespace SrvDrv.ViewModels {
 
         public bool IsDelayStart {
             get {
-                int delayStart, size;
-                Win32.QueryServiceConfig2(Service.ServiceHandle.DangerousGetHandle(), Win32.ServiceInfoLevel.DelayedAutoStart, out delayStart, sizeof(int), out size);
-                return delayStart > 0;
+				try {
+					int delayStart, size;
+					Win32.QueryServiceConfig2(Service.ServiceHandle.DangerousGetHandle(), Win32.ServiceInfoLevel.DelayedAutoStart, out delayStart, sizeof(int), out size);
+					return delayStart > 0;
+				}
+				catch {
+					return false;
+				}
             }
         }
 

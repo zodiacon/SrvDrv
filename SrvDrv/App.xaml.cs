@@ -20,7 +20,7 @@ namespace SrvDrv {
             LoadAssemblies();
         }
 
-        readonly Dictionary<string, Assembly> _assemblies = new Dictionary<string, Assembly>();
+        readonly Dictionary<string, Assembly> _assemblies = new Dictionary<string, Assembly>(4);
 
         private void LoadAssemblies() {
             var appAssembly = typeof(App).Assembly;
@@ -57,7 +57,8 @@ namespace SrvDrv {
             _container = new CompositionContainer(catalog);
             _container.ComposeExportedValue(_container);
             _container.ComposeExportedValue("AppName", "Services and Drivers");
-             
+			_container.ComposeExportedValue<IUIServices>(new UIServicesDefaults());
+
             var vm = _container.GetExportedValue<MainViewModel>();
             var win = new MainWindow { DataContext = vm };
             win.Show();

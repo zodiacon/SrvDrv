@@ -30,7 +30,7 @@ namespace SrvDrv.ViewModels {
         }
 
         [Import]
-        IMessageBoxService MessageBoxService;
+        IUIServices UI;
 
         public MainViewModel() {
             StartCommand = new DelegateCommand(async () => {
@@ -125,10 +125,10 @@ namespace SrvDrv.ViewModels {
                 });
             }
             catch(System.ServiceProcess.TimeoutException) {
-                MessageBoxService.ShowMessage("Operation timed out.", Constants.AppName);
+                UI.MessageBoxService.ShowMessage("Operation timed out.", Constants.AppName);
             }
             catch(Exception ex) {
-                MessageBoxService.ShowMessage($"Error: {ex.Message}", Constants.AppName);
+                UI.MessageBoxService.ShowMessage($"Error: {ex.Message}", Constants.AppName);
             }
             finally {
                 IsBusy = false;
